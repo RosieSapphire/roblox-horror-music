@@ -23,33 +23,31 @@
 /*
 * This RNG function is modified from Super Mario 64's source code: https://github.com/n64decomp/sm64.git
 */
-uint16 rng(uint16* input, uint16 max) {
-	uint16 in_val = *input;
+uint16 rng_val;
+uint16 rng(uint16 max) {
 	uint16 s0;
 	uint16 s1;
 
-	if(in_val == 0x560A) in_val = 0;
-	s0 = (uint8)in_val << 8;
-	s0 ^= in_val;
-	in_val = ((s0 & 0xFF) << 8) | ((s0 & 0xFF00) >> 8);
-	s0 = ((uint8)s0 << 1) ^ in_val;
+	if(rng_val == 0x560A) rng_val = 0;
+	s0 = (uint8)rng_val << 8;
+	s0 ^= rng_val;
+	rng_val = ((s0 & 0xFF) << 8) | ((s0 & 0xFF00) >> 8);
+	s0 = ((uint8)s0 << 1) ^ rng_val;
 	s1 = (s0 >> 1) ^ 0xFF80;
 	if(!(s0 & 1)) {
 		if(s1 == 0xAA55)
-			in_val = 0;
+			rng_val = 0;
 		else
-			in_val = s1 ^ 0x1FF4;
+			rng_val = s1 ^ 0x1FF4;
 	} else {
-		in_val = s1 ^ 0x8180;
+		rng_val = s1 ^ 0x8180;
 	}
 
-	*input = in_val;
-	return (uint16)in_val % max;
+	return (uint16)rng_val % max;
 }
 
 int main() {
 	uint8 i;
-	uint16 rng_val;
 	uint8 last_sample;
 	uint8 current_sample;
 	float32 time_elapsed = 0.0f;
@@ -63,7 +61,7 @@ int main() {
 	boolean close_program = FALSE;
 
 	rng_val = (uint16)time(NULL);
-	last_sample = rng(&rng_val, SFX_COUNT);
+	last_sample = rng(SFX_COUNT);
 	current_sample = last_sample;
 
 	clock = sfClock_create();
@@ -107,7 +105,7 @@ int main() {
 
 		if(time_elapsed >= 10.0f) {
 			while(current_sample == last_sample) {
-				current_sample = rng(&rng_val, SFX_COUNT);
+				current_sample = rng(SFX_COUNT);
 			};
 
 			last_sample = current_sample;
