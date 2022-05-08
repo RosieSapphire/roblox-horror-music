@@ -105,7 +105,6 @@ int main() {
 		time_delta = sfTime_asSeconds(sfClock_restart(clock));
 		time_elapsed += time_delta;
 
-		printf("Timer: %f, Sample: %d\n", time_elapsed, current_sample);
 		if(time_elapsed >= 10.0f) {
 			while(current_sample == last_sample) {
 				current_sample = rng(&rng_val, SFX_COUNT);
